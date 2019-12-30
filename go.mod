@@ -9,4 +9,4 @@ require (
 	github.com/blocktree/openwallet v1.6.0
 )
 
-replace github.com/eoscanada/eos-go v0.8.16 => github.com/blocktree/eos-go v0.8.13-blocktree
+replace github.com/eoscanada/eos-go => github.com/blocktree/eos-go v0.8.13-blocktree
