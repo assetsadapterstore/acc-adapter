@@ -17,9 +17,11 @@ package acc
 
 import (
 	"github.com/assetsadapterstore/acc-adapter/addrdec"
+	"github.com/eoscanada/eos-go"
 )
 
 type addressDecoder struct {
+	addrdec.AddressDecoderV2
 	wm *WalletManager //钱包管理者
 }
 
@@ -37,8 +39,7 @@ func (decoder *addressDecoder) PrivateKeyToWIF(priv []byte, isTestnet bool) (str
 
 //PublicKeyToAddress 公钥转地址
 func (decoder *addressDecoder) PublicKeyToAddress(pub []byte, isTestnet bool) (string, error) {
-	address := addrdec.Default.AddressEncode(pub)
-	return address, nil
+	return addrdec.Default.AddressEncode(pub)
 }
 
 //RedeemScriptToAddress 多重签名赎回脚本转地址
@@ -53,4 +54,13 @@ func (decoder *addressDecoder) WIFToPrivateKey(wif string, isTestnet bool) ([]by
 		return nil, err
 	}
 	return priv, nil
+}
+
+// AddressVerify 地址校验
+func (decoder *addressDecoder) AddressVerify(address string, opts ...interface{}) bool {
+	_, err := decoder.wm.Api.GetAccount(eos.AccountName(address))
+	if err != nil {
+		return false
+	}
+	return true
 }

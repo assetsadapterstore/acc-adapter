@@ -16,18 +16,50 @@
 package acc
 
 import (
+	"github.com/astaxie/beego/config"
+	"path/filepath"
 	"testing"
 
-	"github.com/blocktree/openwallet/openwallet"
-	eos "github.com/eoscanada/eos-go"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/siddontang/go/log"
 )
 
-func TestGetTokenBalanceByAddress(t *testing.T) {
+func testNewWalletManager() *WalletManager {
 	wm := NewWalletManager(nil)
+	//读取配置
+	absFile := filepath.Join("conf", "ACC.ini")
+	//log.Debug("absFile:", absFile)
+	c, err := config.NewConfig("ini", absFile)
+	if err != nil {
+		return nil
+	}
+	wm.LoadAssetsConfig(c)
+	wm.Api.Debug = true
+	return wm
+}
 
-	wm.Config.ServerAPI = "https://accchain.io"
-	wm.Api = eos.New(wm.Config.ServerAPI)
+func TestWalletManager_GetInfo(t *testing.T) {
+	wm := testNewWalletManager()
+	r, err := wm.Api.GetInfo()
+	if err != nil {
+		log.Errorf("unexpected error: %v", err)
+		return
+	}
+	log.Infof("%+v", r)
+}
+
+func TestWalletManager_GetAccount(t *testing.T) {
+	wm := testNewWalletManager()
+	r, err := wm.Api.GetAccount("aaaaaaaaaaaa")
+	if err != nil {
+		log.Errorf("unexpected error: %v", err)
+		return
+	}
+	log.Infof("%+v", r)
+}
+
+func TestGetTokenBalanceByAddress(t *testing.T) {
+	wm := testNewWalletManager()
 
 	contract := openwallet.SmartContract{
 		Address:  "accio.token:ACC",
@@ -35,7 +67,7 @@ func TestGetTokenBalanceByAddress(t *testing.T) {
 		Name:     "ACC",
 		Decimals: 4,
 	}
-	balance, err := wm.ContractDecoder.GetTokenBalanceByAddress(contract, "accjiahua111")
+	balance, err := wm.ContractDecoder.GetTokenBalanceByAddress(contract, "blockins.acc")
 	if err != nil {
 		log.Error("GetTokenBalanceByAddress failed, unexpected error:", err)
 		return

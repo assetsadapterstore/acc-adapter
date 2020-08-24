@@ -17,8 +17,9 @@ package acc
 
 import (
 	"github.com/blocktree/eosio-adapter/eosio"
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
+	"github.com/eoscanada/eos-go/ecc"
 )
 
 const (
@@ -34,6 +35,9 @@ func NewWalletManager(cacheManager openwallet.ICacheManager) *WalletManager {
 	wm.WalletManager = eosio.NewWalletManager(cacheManager)
 	wm.Config = eosio.NewConfig(Symbol)
 	wm.Decoder = NewAddressDecoder(&wm)
+	wm.DecoderV2 = NewAddressDecoder(&wm)
 	wm.Log = log.NewOWLogger(wm.Symbol())
+
+	ecc.PublicKeyPrefixs = []string{"EOS", "ACC"}
 	return &wm
 }

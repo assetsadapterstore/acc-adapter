@@ -16,10 +16,13 @@
 package openwtester
 
 import (
+	"github.com/astaxie/beego/config"
+	"github.com/blocktree/openwallet/v2/openw"
+	"path/filepath"
 	"testing"
 
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 func TestWalletManager_GetTransactions(t *testing.T) {
@@ -98,4 +101,26 @@ func TestWalletManager_GetEstimateFeeRate(t *testing.T) {
 		return
 	}
 	log.Std.Info("feeRate: %s %s/%s", feeRate, coin.Symbol, unit)
+}
+
+func TestGetAddressVerify(t *testing.T) {
+	symbol := "ACC"
+	assetsMgr, err := openw.GetAssetsAdapter(symbol)
+	if err != nil {
+		log.Error(symbol, "is not support")
+		return
+	}
+	//读取配置
+	absFile := filepath.Join(configFilePath, symbol+".ini")
+
+	c, err := config.NewConfig("ini", absFile)
+	if err != nil {
+		return
+	}
+	assetsMgr.LoadAssetsConfig(c)
+	addrDec := assetsMgr.GetAddressDecoderV2()
+
+	flag := addrDec.AddressVerify("")
+	log.Infof("flag: %v", flag)
+
 }
